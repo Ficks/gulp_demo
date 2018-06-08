@@ -17,17 +17,12 @@ gulp.task('less', function () {
 // 解析js
 gulp.task('js', function () {
     gulp.src('src/public/scripts/*.js')
-        .pipe(uglify())
-        .pipe(gulp.dest('dist/public/scripts'));
-})
-// 解析es6
-gulp.task('taskES6', function () {
-    gulp.src('src/public/scripts/*.js')
         .pipe(babel({
             presets: ['es2015']
         }))
-        .pipe(gulp.dest('dist/public/scripts/'));
-});
+        .pipe(uglify())
+        .pipe(gulp.dest('dist/public/scripts'));
+})
 // 解析html
 gulp.task('html', function () {
     gulp.src('src/*.html')
@@ -64,9 +59,9 @@ gulp.task('watch', function () {
     // gulp.watch('src/**/*.*', ['less', 'js'])
     gulp.watch('src/*.html', ['html', 'eventAuto']);
     gulp.watch('src/public/css/*.less', ['less', 'autoprefixer', 'eventAuto']);
-    gulp.watch('src/public/scripts/*.js', ['js', 'taskES6', 'eventAuto']);
+    gulp.watch('src/public/scripts/*.js', ['js', 'eventAuto']);
     gulp.watch('src/public/images/*', ['img', 'eventAuto']);
 })
 
 // 默认执行
-gulp.task('default', ['less', 'js', 'html', 'img', 'taskES6', 'autoprefixer', 'auto', 'watch']);
+gulp.task('default', ['less', 'js', 'html', 'img', 'autoprefixer', 'auto', 'watch']);
