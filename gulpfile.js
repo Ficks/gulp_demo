@@ -1,26 +1,31 @@
 const gulp = require('gulp');
-const less = require('gulp-less');//解析less
-const uglify = require('gulp-uglify');//压缩js
-const babel = require('gulp-babel');//编译es6
-const html = require('gulp-htmlmin');//压缩html
-const imagemin = require('gulp-imagemin');//压缩图片
-const autoprefixer = require('gulp-autoprefixer');//自动解析css前缀
-const browserSync = require('browser-sync');//自动刷新
-const reload = browserSync.reload;//自动刷新
+const less = require('gulp-less'); //解析less
+const uglify = require('gulp-uglify'); //压缩js
+const babel = require('gulp-babel'); //编译es6
+const html = require('gulp-htmlmin'); //压缩html
+const imagemin = require('gulp-imagemin'); //压缩图片
+const autoprefixer = require('gulp-autoprefixer'); //自动解析css前缀
+const browserSync = require('browser-sync'); //自动刷新
+const reload = browserSync.reload; //自动刷新
 var fileinclude = require('gulp-file-include'); //引入 header footer
 
 //引入 header footer  参考：https://www.cnblogs.com/nzbin/p/7467546.html
-// gulp.task('fileinclude', function () {
-// gulp.src(['src/**/*.html', '!src/include/**.html'])//主文件
-//     .pipe(fileinclude({
-//         prefix: '@@',
-//         basepath: '@file'
-//     }))
-//     .pipe(gulp.dest('./dist'));//输出文件路径
-// });
+gulp.task('fileinclude', function () {
+    gulp.src(['src/**/*.html', '!src/include/**.html']) //主文件
+        .pipe(fileinclude({
+            prefix: '@@',
+            basepath: '@file'
+        }))
+        .pipe(gulp.dest('./dist')); //输出文件路径
+});
 
 
+function swallowError(error) {
+    // If you want details of the error in the console
+    console.error(error.toString())
 
+    this.emit('end')
+}
 
 // 解析html
 gulp.task('html', function () {
@@ -30,12 +35,14 @@ gulp.task('html', function () {
             basepath: '@file'
         }))
         .pipe(html())
+        .on('error', swallowError)
         .pipe(gulp.dest('dist/'));
 })
 // 解析less
 gulp.task('less', function () {
     gulp.src('src/public/css/*.less')
         .pipe(less())
+        .on('error', swallowError)
         .pipe(gulp.dest('dist/public/css'));
 })
 // 解析js
@@ -45,12 +52,14 @@ gulp.task('js', function () {
             presets: ['es2015']
         }))
         // .pipe(uglify())
+        .on('error', swallowError)
         .pipe(gulp.dest('dist/public/scripts'));
 })
 // 压缩图片
 gulp.task('img', function () {
     gulp.src('src/public/images/*')
         .pipe(imagemin())
+        .on('error', swallowError)
         .pipe(gulp.dest('dist/public/images'));
 });
 
@@ -58,6 +67,7 @@ gulp.task('img', function () {
 gulp.task('autoprefixer', function () {
     gulp.src('src/public/css/*.less')
         .pipe(autoprefixer())
+        .on('error', swallowError)
         .pipe(gulp.dest('dist/public/css'));
 });
 gulp.task('reload', () => {
@@ -76,7 +86,7 @@ gulp.task("auto", function () {
 
 gulp.task('watch', function () {
     // gulp.watch('src/**/*.*', ['less', 'js'])
-    gulp.watch('src/*.html', ['html', 'reload']);
+    gulp.watch('src/*.html', ['html', 'reload', ]);
     gulp.watch('src/public/css/*.less', ['less', 'autoprefixer', 'reload']);
     gulp.watch('src/public/scripts/*.js', ['js', 'reload']);
     gulp.watch('src/public/images/*', ['img', 'reload']);
